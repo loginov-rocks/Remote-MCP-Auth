@@ -1,5 +1,6 @@
 import { json, Request, Response, Router } from 'express';
 
+import { PROTECTED_RESOURCE_METADATA_ROUTE } from './constants';
 import { mcpAuthMiddleware, mcpSseController, mcpStreamableController, oauthController } from './container';
 
 export const router = Router();
@@ -19,4 +20,7 @@ router.get('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableControlle
 router.delete('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableController.deleteMcp);
 
 // Auth-related.
-router.get('/.well-known/oauth-authorization-server', oauthController.getWellKnown);
+router.get(PROTECTED_RESOURCE_METADATA_ROUTE, oauthController.getProtectedResourceMetadata);
+// Deprecated as per 2025-06-18 Authorization spec, this endpoint should be provided by the authorization server, not
+// by the MCP server. Leaving for backward compatibility.
+router.get('/.well-known/oauth-authorization-server', oauthController.getAuthorizationServerMetadata);

@@ -1,21 +1,27 @@
 import { Request, Response } from 'express';
 
 interface Options {
+  mcpBaseUrl: string;
   oauthApiBaseUrl: string;
 }
 
 export class OAuthController {
+  private readonly mcpBaseUrl: string;
   private readonly oauthApiBaseUrl: string;
 
+  // @deprecated
   private oauthWellKnown = null;
 
-  constructor({ oauthApiBaseUrl }: Options) {
+  constructor({ mcpBaseUrl, oauthApiBaseUrl }: Options) {
+    this.mcpBaseUrl = mcpBaseUrl;
     this.oauthApiBaseUrl = oauthApiBaseUrl;
 
-    this.getWellKnown = this.getWellKnown.bind(this);
+    this.getAuthorizationServerMetadata = this.getAuthorizationServerMetadata.bind(this);
+    this.getProtectedResourceMetadata = this.getProtectedResourceMetadata.bind(this);
   }
 
-  public async getWellKnown(req: Request, res: Response): Promise<void> {
+  // @deprecated
+  public async getAuthorizationServerMetadata(req: Request, res: Response): Promise<void> {
     let wellKnown;
     try {
       wellKnown = await this.fetchOAuthWellKnown();
@@ -28,6 +34,16 @@ export class OAuthController {
     res.json(wellKnown);
   }
 
+  public async getProtectedResourceMetadata(req: Request, res: Response): Promise<void> {
+    res.json({
+      resource: this.mcpBaseUrl,
+      authorization_servers: [
+        this.oauthApiBaseUrl,
+      ],
+    });
+  }
+
+  // @deprecated
   private async fetchOAuthWellKnown() {
     if (this.oauthWellKnown) {
       return this.oauthWellKnown;

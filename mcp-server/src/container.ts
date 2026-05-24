@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN_SECRET, OAUTH_API_BASE_URL } from './constants';
+import { ACCESS_TOKEN_SECRET, MCP_BASE_URL, OAUTH_API_BASE_URL, PROTECTED_RESOURCE_METADATA_ROUTE } from './constants';
 
 import { McpSseController } from './controllers/McpSseController';
 import { McpStreamableController } from './controllers/McpStreamableController';
@@ -27,6 +27,8 @@ const mcpServer = new McpServer({
 });
 
 export const mcpAuthMiddleware = new McpAuthMiddleware({
+  mcpBaseUrl: MCP_BASE_URL,
+  protectedResourceMetadataRoute: PROTECTED_RESOURCE_METADATA_ROUTE,
   tokenService,
 });
 
@@ -39,5 +41,6 @@ export const mcpStreamableController = new McpStreamableController({
 });
 
 export const oauthController = new OAuthController({
+  mcpBaseUrl: MCP_BASE_URL,
   oauthApiBaseUrl: OAUTH_API_BASE_URL,
 });
