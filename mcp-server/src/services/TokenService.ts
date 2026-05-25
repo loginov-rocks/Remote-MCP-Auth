@@ -2,8 +2,8 @@ import { type JwtPayload, verify } from 'jsonwebtoken';
 
 interface Options {
   accessTokenSecret: string;
-  mcpBaseUrl: string;
-  oauthApiBaseUrl: string;
+  authorizationServerBaseUrl: string;
+  mcpServerBaseUrl: string;
 }
 
 interface VerifiedToken {
@@ -15,13 +15,13 @@ interface VerifiedToken {
 
 export class TokenService {
   private readonly accessTokenSecret: string;
-  private readonly mcpBaseUrl: string;
-  private readonly oauthApiBaseUrl: string;
+  private readonly authorizationServerBaseUrl: string;
+  private readonly mcpServerBaseUrl: string;
 
-  constructor({ accessTokenSecret, mcpBaseUrl, oauthApiBaseUrl }: Options) {
+  constructor({ accessTokenSecret, authorizationServerBaseUrl, mcpServerBaseUrl }: Options) {
     this.accessTokenSecret = accessTokenSecret;
-    this.mcpBaseUrl = mcpBaseUrl;
-    this.oauthApiBaseUrl = oauthApiBaseUrl;
+    this.authorizationServerBaseUrl = authorizationServerBaseUrl;
+    this.mcpServerBaseUrl = mcpServerBaseUrl;
   }
 
   public verifyToken(token: string): VerifiedToken | null {
@@ -29,8 +29,8 @@ export class TokenService {
     try {
       decoded = verify(token, this.accessTokenSecret, {
         algorithms: ['HS256'],
-        audience: this.mcpBaseUrl,
-        issuer: this.oauthApiBaseUrl,
+        audience: this.mcpServerBaseUrl,
+        issuer: this.authorizationServerBaseUrl,
       }) as JwtPayload;
     } catch {
       return null;

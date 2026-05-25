@@ -1,20 +1,20 @@
 import type { Request, Response } from 'express';
 
 interface Options {
-  mcpBaseUrl: string;
-  oauthApiBaseUrl: string;
+  authorizationServerBaseUrl: string;
+  mcpServerBaseUrl: string;
 }
 
 export class OAuthController {
-  private readonly mcpBaseUrl: string;
-  private readonly oauthApiBaseUrl: string;
+  private readonly authorizationServerBaseUrl: string;
+  private readonly mcpServerBaseUrl: string;
 
   // @deprecated
   private oauthWellKnown = null;
 
-  constructor({ mcpBaseUrl, oauthApiBaseUrl }: Options) {
-    this.mcpBaseUrl = mcpBaseUrl;
-    this.oauthApiBaseUrl = oauthApiBaseUrl;
+  constructor({ authorizationServerBaseUrl, mcpServerBaseUrl }: Options) {
+    this.authorizationServerBaseUrl = authorizationServerBaseUrl;
+    this.mcpServerBaseUrl = mcpServerBaseUrl;
 
     this.getAuthorizationServerMetadata = this.getAuthorizationServerMetadata.bind(this);
     this.getProtectedResourceMetadata = this.getProtectedResourceMetadata.bind(this);
@@ -36,9 +36,9 @@ export class OAuthController {
 
   public async getProtectedResourceMetadata(req: Request, res: Response): Promise<void> {
     res.json({
-      resource: this.mcpBaseUrl,
+      resource: this.mcpServerBaseUrl,
       authorization_servers: [
-        this.oauthApiBaseUrl,
+        this.authorizationServerBaseUrl,
       ],
       bearer_methods_supported: [
         'header',
@@ -52,7 +52,7 @@ export class OAuthController {
       return this.oauthWellKnown;
     }
 
-    const url = `${this.oauthApiBaseUrl}/.well-known/oauth-authorization-server`;
+    const url = `${this.authorizationServerBaseUrl}/.well-known/oauth-authorization-server`;
 
     let response;
     try {

@@ -1,5 +1,5 @@
 import {
-  ACCESS_TOKEN_SECRET, MCP_BASE_URL, OAUTH_API_BASE_URL, PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE,
+  ACCESS_TOKEN_SECRET, AUTHORIZATION_SERVER_BASE_URL, MCP_SERVER_BASE_URL, PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE,
 } from './constants';
 
 import { McpSseController } from './controllers/McpSseController';
@@ -20,8 +20,8 @@ const studentService = new StudentService();
 
 const tokenService = new TokenService({
   accessTokenSecret: ACCESS_TOKEN_SECRET,
-  mcpBaseUrl: MCP_BASE_URL,
-  oauthApiBaseUrl: OAUTH_API_BASE_URL,
+  authorizationServerBaseUrl: AUTHORIZATION_SERVER_BASE_URL,
+  mcpServerBaseUrl: MCP_SERVER_BASE_URL,
 });
 
 const mcpServerFactory = new McpServerFactory({
@@ -30,7 +30,7 @@ const mcpServerFactory = new McpServerFactory({
 });
 
 export const mcpAuthMiddleware = new McpAuthMiddleware({
-  mcpBaseUrl: MCP_BASE_URL,
+  mcpServerBaseUrl: MCP_SERVER_BASE_URL,
   protectedResourceMetadataRoute: PROTECTED_RESOURCE_METADATA_ROUTE,
   studentService,
   tokenService,
@@ -46,6 +46,6 @@ export const mcpStreamableController = new McpStreamableController({
 });
 
 export const oauthController = new OAuthController({
-  mcpBaseUrl: MCP_BASE_URL,
-  oauthApiBaseUrl: OAUTH_API_BASE_URL,
+  authorizationServerBaseUrl: AUTHORIZATION_SERVER_BASE_URL,
+  mcpServerBaseUrl: MCP_SERVER_BASE_URL,
 });

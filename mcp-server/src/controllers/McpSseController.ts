@@ -23,6 +23,14 @@ export class McpSseController {
     this.postMessages = this.postMessages.bind(this);
   }
 
+  public async closeTransports(): Promise<void> {
+    for (const transport of this.transports.values()) {
+      await transport.close();
+    }
+
+    this.transports.clear();
+  }
+
   public async getSse(req: McpAuthenticatedRequest, res: Response): Promise<void> {
     if (!req.auth?.extra?.studentId) {
       res.status(401).send('Unauthorized');

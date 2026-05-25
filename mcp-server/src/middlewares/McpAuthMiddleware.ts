@@ -5,7 +5,7 @@ import type { StudentService } from '../services/StudentService';
 import type { TokenService } from '../services/TokenService';
 
 interface Options {
-  mcpBaseUrl: string;
+  mcpServerBaseUrl: string;
   protectedResourceMetadataRoute: string;
   studentService: StudentService;
   tokenService: TokenService;
@@ -20,13 +20,13 @@ export interface McpAuthenticatedRequest extends Request {
 }
 
 export class McpAuthMiddleware {
-  private readonly mcpBaseUrl: string;
+  private readonly mcpServerBaseUrl: string;
   private readonly protectedResourceMetadataRoute: string;
   private readonly studentService: StudentService;
   private readonly tokenService: TokenService;
 
-  constructor({ mcpBaseUrl, protectedResourceMetadataRoute, studentService, tokenService }: Options) {
-    this.mcpBaseUrl = mcpBaseUrl;
+  constructor({ mcpServerBaseUrl, protectedResourceMetadataRoute, studentService, tokenService }: Options) {
+    this.mcpServerBaseUrl = mcpServerBaseUrl;
     this.protectedResourceMetadataRoute = protectedResourceMetadataRoute;
     this.studentService = studentService;
     this.tokenService = tokenService;
@@ -43,7 +43,7 @@ export class McpAuthMiddleware {
    * Alternatively, use SDK's requireBearerAuth() to outsource control.
    */
   public requireAuth(req: McpAuthenticatedRequest, res: Response, next: NextFunction): void {
-    const wwwAuthenticateHeader = `Bearer resource_metadata="${this.mcpBaseUrl}${this.protectedResourceMetadataRoute}"`;
+    const wwwAuthenticateHeader = `Bearer resource_metadata="${this.mcpServerBaseUrl}${this.protectedResourceMetadataRoute}"`;
 
     if (!req.headers.authorization?.startsWith('Bearer ')) {
       res.set('WWW-Authenticate', wwwAuthenticateHeader).status(401).send('Unauthorized');
