@@ -216,6 +216,12 @@
             "AUTH_CODES_TTL": {
               "Ref": "AuthCodesTtl"
             },
+            "AUTHORIZATION_SERVER_BASE_URL": {
+              "Fn::GetAtt": [
+                "ApiGateway",
+                "ApiEndpoint"
+              ]
+            },
             "REFRESH_TOKEN_SECRET": {
               "Ref": "RefreshTokenSecret"
             },

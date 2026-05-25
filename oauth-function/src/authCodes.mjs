@@ -9,7 +9,7 @@ const dynamoDbDocumentClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
 const generateCode = () => randomBytes(32).toString('hex');
 
-export const createCode = async (studentId, codeChallenge) => {
+export const createCode = async (studentId, codeChallenge, scope) => {
   const code = generateCode();
 
   const now = Math.floor(Date.now() / 1000);
@@ -20,6 +20,7 @@ export const createCode = async (studentId, codeChallenge) => {
     codeChallenge,
     expiration,
     studentId,
+    scope,
   };
 
   const putCommand = new PutCommand({

@@ -1,6 +1,6 @@
 import { createHmac } from 'crypto';
 
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TTL, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TTL } from './constants.mjs';
+import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TTL, AUTHORIZATION_SERVER_BASE_URL, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TTL } from './constants.mjs';
 
 const base64UrlEncode = (str) => Buffer.from(str)
   .toString('base64')
@@ -23,19 +23,28 @@ const generateSignature = (secret, header, payload) => createHmac('sha256', secr
   .replace(/\//g, '_')
   .replace(/=/g, '');
 
-const generateJwt = (secret, sub, expiresIn, clientId) => {
+const generateJwt = (secret, sub, expiresIn, clientId, resource, scope) => {
   const header = {
     alg: 'HS256',
     typ: 'JWT',
   };
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    sub,
     exp: now + expiresIn,
+    iss: AUTHORIZATION_SERVER_BASE_URL,
+    sub,
   };
 
   if (clientId) {
     payload.client_id = clientId;
+  }
+
+  if (resource) {
+    payload.aud = resource;
+  }
+
+  if (scope) {
+    payload.scope = scope;
   }
 
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
@@ -67,16 +76,16 @@ const validateJwt = (secret, jwt) => {
   return payload;
 };
 
-export const createAccessToken = (studentId, clientId) => {
+export const createAccessToken = (studentId, clientId, resource, scope) => {
   const expiresIn = ACCESS_TOKEN_TTL;
-  const accessToken = generateJwt(ACCESS_TOKEN_SECRET, studentId, expiresIn, clientId);
+  const accessToken = generateJwt(ACCESS_TOKEN_SECRET, studentId, expiresIn, clientId, resource, scope);
 
   return { accessToken, expiresIn };
 };
 
-export const createRefreshToken = (studentId) => {
+export const createRefreshToken = (studentId, scope) => {
   const expiresIn = REFRESH_TOKEN_TTL;
-  const refreshToken = generateJwt(REFRESH_TOKEN_SECRET, studentId, expiresIn);
+  const refreshToken = generateJwt(REFRESH_TOKEN_SECRET, studentId, expiresIn, null, null, scope);
 
   return { refreshToken, expiresIn };
 };

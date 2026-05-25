@@ -18,6 +18,7 @@ export const postTokenHandler = async (event) => {
   console.log('params', JSON.stringify(params));
 
   let studentId = null;
+  let scope = null;
 
   if (params.grant_type === 'authorization_code') {
     if (!params.code || !params.code_verifier) {
@@ -32,7 +33,7 @@ export const postTokenHandler = async (event) => {
       return { statusCode: 500 };
     }
 
-    if (!code || !code.code || !code.codeChallenge || !code.studentId) {
+    if (!code || !code.code || !code.codeChallenge || !code.studentId || !code.scope) {
       return { statusCode: 400 };
     }
 
@@ -48,6 +49,7 @@ export const postTokenHandler = async (event) => {
     }
 
     studentId = code.studentId;
+    scope = code.scope;
   } else if (params.grant_type === 'refresh_token') {
     if (!params.refresh_token) {
       return { statusCode: 400 };
@@ -60,14 +62,13 @@ export const postTokenHandler = async (event) => {
     }
 
     studentId = refreshTokenPayload.sub;
+    scope = refreshTokenPayload.scope;
   } else {
     return { statusCode: 400 };
   }
 
-  const { accessToken, expiresIn } = createAccessToken(studentId, params.client_id);
-  const { refreshToken } = createRefreshToken(studentId);
-  // Comes from the previously stored params.
-  const scope = 'claudeai';
+  const { accessToken, expiresIn } = createAccessToken(studentId, params.client_id, params.resource, scope);
+  const { refreshToken } = createRefreshToken(studentId, scope);
 
   return {
     statusCode: 200,
@@ -77,7 +78,7 @@ export const postTokenHandler = async (event) => {
       token_type: 'Bearer',
       expires_in: expiresIn,
       refresh_token: refreshToken,
-      scope: scope,
+      scope,
     }),
   };
 };

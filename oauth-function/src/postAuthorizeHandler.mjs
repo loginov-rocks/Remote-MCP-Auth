@@ -15,7 +15,7 @@ export const postAuthorizeHandler = async (event) => {
   // `code_challenge`, `redirect_uri`, and `scope` for validation during token exchange.
   let code;
   try {
-    code = await createCode(params.student_id, params.code_challenge);
+    code = await createCode(params.student_id, params.code_challenge, params.scope);
   } catch (error) {
     console.error(error);
     return { statusCode: 500 };
