@@ -1,6 +1,6 @@
 import { json, Request, Response, Router } from 'express';
 
-import { PROTECTED_RESOURCE_METADATA_ROUTE } from './constants';
+import { PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE } from './constants';
 import { mcpAuthMiddleware, mcpSseController, mcpStreamableController, oauthController } from './container';
 
 export const router = Router();
@@ -12,7 +12,7 @@ router.get('/', (req: Request, res: Response) => {
 
 // SSE.
 router.get('/sse', mcpAuthMiddleware.requireAuth, mcpSseController.getSse);
-router.post('/messages', mcpAuthMiddleware.requireAuth, mcpSseController.postMessages);
+router.post(SSE_MESSAGES_ROUTE, mcpAuthMiddleware.requireAuth, mcpSseController.postMessages);
 
 // Streamable HTTP.
 router.post('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableController.postMcp);

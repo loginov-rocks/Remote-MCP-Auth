@@ -23,7 +23,7 @@ const generateSignature = (secret, header, payload) => createHmac('sha256', secr
   .replace(/\//g, '_')
   .replace(/=/g, '');
 
-const generateJwt = (secret, sub, expiresIn) => {
+const generateJwt = (secret, sub, expiresIn, clientId) => {
   const header = {
     alg: 'HS256',
     typ: 'JWT',
@@ -33,6 +33,10 @@ const generateJwt = (secret, sub, expiresIn) => {
     sub,
     exp: now + expiresIn,
   };
+
+  if (clientId) {
+    payload.client_id = clientId;
+  }
 
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
   const encodedPayload = base64UrlEncode(JSON.stringify(payload));
@@ -63,9 +67,9 @@ const validateJwt = (secret, jwt) => {
   return payload;
 };
 
-export const createAccessToken = (studentId) => {
+export const createAccessToken = (studentId, clientId) => {
   const expiresIn = ACCESS_TOKEN_TTL;
-  const accessToken = generateJwt(ACCESS_TOKEN_SECRET, studentId, expiresIn);
+  const accessToken = generateJwt(ACCESS_TOKEN_SECRET, studentId, expiresIn, clientId);
 
   return { accessToken, expiresIn };
 };

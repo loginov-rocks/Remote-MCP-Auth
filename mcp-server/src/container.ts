@@ -1,10 +1,12 @@
-import { ACCESS_TOKEN_SECRET, MCP_BASE_URL, OAUTH_API_BASE_URL, PROTECTED_RESOURCE_METADATA_ROUTE } from './constants';
+import {
+  ACCESS_TOKEN_SECRET, MCP_BASE_URL, OAUTH_API_BASE_URL, PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE,
+} from './constants';
 
 import { McpSseController } from './controllers/McpSseController';
 import { McpStreamableController } from './controllers/McpStreamableController';
 import { OAuthController } from './controllers/OAuthController';
 
-import { McpServer } from './mcp/McpServer';
+import { McpServerFactory } from './mcp/McpServerFactory';
 
 import { McpAuthMiddleware } from './middlewares/McpAuthMiddleware';
 
@@ -21,7 +23,7 @@ const tokenService = new TokenService({
   studentService,
 });
 
-const mcpServer = new McpServer({
+const mcpServerFactory = new McpServerFactory({
   armyService,
   studentService,
 });
@@ -33,11 +35,12 @@ export const mcpAuthMiddleware = new McpAuthMiddleware({
 });
 
 export const mcpSseController = new McpSseController({
-  mcpServer,
+  mcpServerFactory,
+  sseMessagesRoute: SSE_MESSAGES_ROUTE,
 })
 
 export const mcpStreamableController = new McpStreamableController({
-  mcpServer,
+  mcpServerFactory,
 });
 
 export const oauthController = new OAuthController({

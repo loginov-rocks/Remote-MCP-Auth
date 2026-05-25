@@ -1,6 +1,6 @@
-import { verify } from 'jsonwebtoken';
+import { type JwtPayload, verify } from 'jsonwebtoken';
 
-import { StudentService } from './StudentService';
+import type { StudentService } from './StudentService';
 
 interface Options {
   accessTokenSecret: string;
@@ -16,24 +16,27 @@ export class TokenService {
     this.studentService = studentService;
   }
 
-  public validateToken(token: string): string | null {
+  public validateToken(token: string): { clientId: string; studentId: string; } | null {
     let decoded;
     try {
-      decoded = verify(token, this.accessTokenSecret);
+      decoded = verify(token, this.accessTokenSecret) as JwtPayload;
     } catch {
       return null;
     }
 
-    if (!decoded.sub) {
+    if (!decoded.sub || !decoded.client_id) {
       return null;
     }
 
-    const student = this.studentService.getStudent(decoded.sub as string);
+    const student = this.studentService.getStudent(decoded.sub);
 
     if (!student) {
       return null;
     }
 
-    return student.studentId;
+    return {
+      clientId: decoded.client_id,
+      studentId: student.studentId,
+    };
   }
 }

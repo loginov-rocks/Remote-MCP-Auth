@@ -64,7 +64,7 @@ export const postTokenHandler = async (event) => {
     return { statusCode: 400 };
   }
 
-  const { accessToken, expiresIn } = createAccessToken(studentId);
+  const { accessToken, expiresIn } = createAccessToken(studentId, params.client_id);
   const { refreshToken } = createRefreshToken(studentId);
   // Comes from the previously stored params.
   const scope = 'claudeai';

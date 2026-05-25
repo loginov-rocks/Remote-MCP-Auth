@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 interface Options {
   mcpBaseUrl: string;
@@ -39,6 +39,9 @@ export class OAuthController {
       resource: this.mcpBaseUrl,
       authorization_servers: [
         this.oauthApiBaseUrl,
+      ],
+      bearer_methods_supported: [
+        'header',
       ],
     });
   }

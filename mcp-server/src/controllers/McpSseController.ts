@@ -1,52 +1,78 @@
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { Response } from 'express';
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse';
+import type { Response } from 'express';
 
-import { McpServer } from '../mcp/McpServer';
-import { McpAuthenticatedRequest } from '../middlewares/McpAuthMiddleware';
+import type { McpServerFactory } from '../mcp/McpServerFactory';
+import type { McpAuthenticatedRequest } from '../middlewares/McpAuthMiddleware';
 
 interface Options {
-  mcpServer: McpServer;
+  mcpServerFactory: McpServerFactory;
+  sseMessagesRoute: string;
 }
 
 export class McpSseController {
-  private readonly mcpServer: McpServer;
+  private readonly mcpServerFactory: McpServerFactory;
+  private readonly sseMessagesRoute: string;
 
-  private readonly transportsMap: Map<string, SSEServerTransport> = new Map();
+  private readonly transports: Map<string, SSEServerTransport> = new Map();
 
-  constructor({ mcpServer }: Options) {
-    this.mcpServer = mcpServer;
+  constructor({ mcpServerFactory, sseMessagesRoute }: Options) {
+    this.mcpServerFactory = mcpServerFactory;
+    this.sseMessagesRoute = sseMessagesRoute;
 
     this.getSse = this.getSse.bind(this);
     this.postMessages = this.postMessages.bind(this);
   }
 
   public async getSse(req: McpAuthenticatedRequest, res: Response): Promise<void> {
-    const transport = new SSEServerTransport('/messages', res);
+    if (!req.auth?.extra?.studentId) {
+      res.status(401).send('Unauthorized');
+      return;
+    }
 
-    this.transportsMap.set(transport.sessionId, transport);
+    const transport = new SSEServerTransport(this.sseMessagesRoute, res);
+    // Composite key to bind the session ID to the student and client ID. Survives token refresh.
+    const transportId = this.createCompositeKey(req.auth.extra.studentId, req.auth.clientId, transport.sessionId);
+
+    this.transports.set(transportId, transport);
 
     res.on('close', () => {
-      this.transportsMap.delete(transport.sessionId);
+      console.log(`SSE transport "${transportId}" closed`);
+      this.transports.delete(transportId);
     });
 
-    await this.mcpServer.connect(transport);
+    const mcpServer = this.mcpServerFactory.create();
+    await mcpServer.connect(transport);
+
+    console.log(`New SSE transport "${transportId}" connected`);
   }
 
   public async postMessages(req: McpAuthenticatedRequest, res: Response): Promise<void> {
+    if (!req.auth?.extra?.studentId) {
+      res.status(401).send('Unauthorized');
+      return;
+    }
+
     const { sessionId } = req.query;
 
     if (!sessionId || typeof sessionId !== 'string') {
-      res.status(400).send('Session ID missing');
+      res.status(400).send('Missing or invalid session ID');
       return;
     }
 
-    const transport = this.transportsMap.get(sessionId);
+    const transportId = this.createCompositeKey(req.auth.extra.studentId, req.auth.clientId, sessionId);
+    const transport = this.transports.get(transportId);
 
     if (!transport) {
-      res.status(400).send(`Transport not found for session ID ${sessionId}`);
+      res.status(404).send(`No transport found for session "${sessionId}"`);
       return;
     }
 
+    console.log(`Routing POST message to transport "${transportId}"`);
+
     await transport.handlePostMessage(req, res);
+  }
+
+  private createCompositeKey(userId: string, clientId: string, sessionId: string) {
+    return `${userId}:${clientId}:${sessionId}`;
   }
 }
