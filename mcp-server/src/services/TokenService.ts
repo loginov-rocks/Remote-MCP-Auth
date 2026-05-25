@@ -1,42 +1,50 @@
 import { type JwtPayload, verify } from 'jsonwebtoken';
 
-import type { StudentService } from './StudentService';
-
 interface Options {
   accessTokenSecret: string;
-  studentService: StudentService;
+  mcpBaseUrl: string;
+  oauthApiBaseUrl: string;
+}
+
+interface VerifiedToken {
+  clientId: string;
+  expiresAt: number;
+  scopes: string[];
+  studentId: string;
 }
 
 export class TokenService {
   private readonly accessTokenSecret: string;
-  private readonly studentService: StudentService;
+  private readonly mcpBaseUrl: string;
+  private readonly oauthApiBaseUrl: string;
 
-  constructor({ accessTokenSecret, studentService }: Options) {
+  constructor({ accessTokenSecret, mcpBaseUrl, oauthApiBaseUrl }: Options) {
     this.accessTokenSecret = accessTokenSecret;
-    this.studentService = studentService;
+    this.mcpBaseUrl = mcpBaseUrl;
+    this.oauthApiBaseUrl = oauthApiBaseUrl;
   }
 
-  public validateToken(token: string): { clientId: string; studentId: string; } | null {
+  public verifyToken(token: string): VerifiedToken | null {
     let decoded;
     try {
-      decoded = verify(token, this.accessTokenSecret) as JwtPayload;
+      decoded = verify(token, this.accessTokenSecret, {
+        algorithms: ['HS256'],
+        audience: this.mcpBaseUrl,
+        issuer: this.oauthApiBaseUrl,
+      }) as JwtPayload;
     } catch {
       return null;
     }
 
-    if (!decoded.sub || !decoded.client_id) {
-      return null;
-    }
-
-    const student = this.studentService.getStudent(decoded.sub);
-
-    if (!student) {
+    if (!decoded.client_id || !decoded.exp || !decoded.sub) {
       return null;
     }
 
     return {
       clientId: decoded.client_id,
-      studentId: student.studentId,
+      expiresAt: decoded.exp,
+      scopes: decoded.scope ? decoded.scope.split(' ') : [],
+      studentId: decoded.sub,
     };
   }
 }

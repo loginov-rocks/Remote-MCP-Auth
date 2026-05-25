@@ -20,7 +20,8 @@ const studentService = new StudentService();
 
 const tokenService = new TokenService({
   accessTokenSecret: ACCESS_TOKEN_SECRET,
-  studentService,
+  mcpBaseUrl: MCP_BASE_URL,
+  oauthApiBaseUrl: OAUTH_API_BASE_URL,
 });
 
 const mcpServerFactory = new McpServerFactory({
@@ -31,6 +32,7 @@ const mcpServerFactory = new McpServerFactory({
 export const mcpAuthMiddleware = new McpAuthMiddleware({
   mcpBaseUrl: MCP_BASE_URL,
   protectedResourceMetadataRoute: PROTECTED_RESOURCE_METADATA_ROUTE,
+  studentService,
   tokenService,
 });
 

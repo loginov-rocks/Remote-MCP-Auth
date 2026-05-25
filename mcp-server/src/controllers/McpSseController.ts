@@ -31,19 +31,19 @@ export class McpSseController {
 
     const transport = new SSEServerTransport(this.sseMessagesRoute, res);
     // Composite key to bind the session ID to the student and client ID. Survives token refresh.
-    const transportId = this.createCompositeKey(req.auth.extra.studentId, req.auth.clientId, transport.sessionId);
+    const transportKey = this.createTransportKey(req.auth.extra.studentId, req.auth.clientId, transport.sessionId);
 
-    this.transports.set(transportId, transport);
+    this.transports.set(transportKey, transport);
 
     res.on('close', () => {
-      console.log(`SSE transport "${transportId}" closed`);
-      this.transports.delete(transportId);
+      console.log(`SSE transport "${transportKey}" closed`);
+      this.transports.delete(transportKey);
     });
 
     const mcpServer = this.mcpServerFactory.create();
     await mcpServer.connect(transport);
 
-    console.log(`New SSE transport "${transportId}" connected`);
+    console.log(`New SSE transport "${transportKey}" connected`);
   }
 
   public async postMessages(req: McpAuthenticatedRequest, res: Response): Promise<void> {
@@ -59,20 +59,20 @@ export class McpSseController {
       return;
     }
 
-    const transportId = this.createCompositeKey(req.auth.extra.studentId, req.auth.clientId, sessionId);
-    const transport = this.transports.get(transportId);
+    const transportKey = this.createTransportKey(req.auth.extra.studentId, req.auth.clientId, sessionId);
+    const transport = this.transports.get(transportKey);
 
     if (!transport) {
       res.status(404).send(`No transport found for session "${sessionId}"`);
       return;
     }
 
-    console.log(`Routing POST message to transport "${transportId}"`);
+    console.log(`Routing POST message to transport "${transportKey}"`);
 
     await transport.handlePostMessage(req, res);
   }
 
-  private createCompositeKey(userId: string, clientId: string, sessionId: string) {
-    return `${userId}:${clientId}:${sessionId}`;
+  private createTransportKey(studentId: string, clientId: string, sessionId: string) {
+    return JSON.stringify([studentId, clientId, sessionId]);
   }
 }

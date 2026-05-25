@@ -1,4 +1,4 @@
-import { json, Request, Response, Router } from 'express';
+import { json, type Request, type Response, Router } from 'express';
 
 import { PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE } from './constants';
 import { mcpAuthMiddleware, mcpSseController, mcpStreamableController, oauthController } from './container';

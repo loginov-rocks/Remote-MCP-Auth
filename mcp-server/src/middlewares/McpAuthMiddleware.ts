@@ -1,11 +1,13 @@
 import type { AuthInfo } from '@modelcontextprotocol/sdk/server/auth/types';
 import type { NextFunction, Request, Response } from 'express';
 
+import type { StudentService } from '../services/StudentService';
 import type { TokenService } from '../services/TokenService';
 
 interface Options {
   mcpBaseUrl: string;
   protectedResourceMetadataRoute: string;
+  studentService: StudentService;
   tokenService: TokenService;
 }
 
@@ -20,11 +22,13 @@ export interface McpAuthenticatedRequest extends Request {
 export class McpAuthMiddleware {
   private readonly mcpBaseUrl: string;
   private readonly protectedResourceMetadataRoute: string;
+  private readonly studentService: StudentService;
   private readonly tokenService: TokenService;
 
-  constructor({ mcpBaseUrl, protectedResourceMetadataRoute, tokenService }: Options) {
+  constructor({ mcpBaseUrl, protectedResourceMetadataRoute, studentService, tokenService }: Options) {
     this.mcpBaseUrl = mcpBaseUrl;
     this.protectedResourceMetadataRoute = protectedResourceMetadataRoute;
+    this.studentService = studentService;
     this.tokenService = tokenService;
 
     this.requireAuth = this.requireAuth.bind(this);
@@ -42,37 +46,39 @@ export class McpAuthMiddleware {
     const wwwAuthenticateHeader = `Bearer resource_metadata="${this.mcpBaseUrl}${this.protectedResourceMetadataRoute}"`;
 
     if (!req.headers.authorization?.startsWith('Bearer ')) {
-      res.set('WWW-Authenticate', wwwAuthenticateHeader)
-        .status(401)
-        .send('Unauthorized');
+      res.set('WWW-Authenticate', wwwAuthenticateHeader).status(401).send('Unauthorized');
       return;
     }
 
     const token = req.headers.authorization.substring(7);
 
     if (!token) {
-      res.set('WWW-Authenticate', wwwAuthenticateHeader)
-        .status(401)
-        .send('Unauthorized');
+      res.set('WWW-Authenticate', wwwAuthenticateHeader).status(401).send('Unauthorized');
       return;
     }
 
-    const validationResponse = this.tokenService.validateToken(token);
+    const verifiedToken = this.tokenService.verifyToken(token);
 
-    if (!validationResponse) {
-      res.set('WWW-Authenticate', wwwAuthenticateHeader)
-        .status(401)
-        .send('Unauthorized');
+    if (!verifiedToken) {
+      res.set('WWW-Authenticate', wwwAuthenticateHeader).status(401).send('Unauthorized');
+      return;
+    }
+
+    const student = this.studentService.getStudent(verifiedToken.studentId);
+
+    if (!student) {
+      res.set('WWW-Authenticate', wwwAuthenticateHeader).status(401).send('Unauthorized');
       return;
     }
 
     req.auth = {
-      clientId: validationResponse.clientId,
-      extra: {
-        studentId: validationResponse.studentId,
-      },
-      scopes: [],
       token,
+      clientId: verifiedToken.clientId,
+      scopes: verifiedToken.scopes,
+      expiresAt: verifiedToken.expiresAt,
+      extra: {
+        studentId: student.studentId,
+      },
     };
 
     next();
