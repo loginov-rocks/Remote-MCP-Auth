@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { PORT } from './constants';
-import { mcpSseController } from './container';
+import { mcpSseController, mcpStreamableController } from './container';
 import { router } from './router';
 
 const app = express();
@@ -16,6 +16,7 @@ async function shutdown(): Promise<void> {
   console.log('Shutting down server...');
 
   await mcpSseController.closeTransports();
+  await mcpStreamableController.closeTransports();
 
   server.close(() => {
     console.log('Server shutdown complete');

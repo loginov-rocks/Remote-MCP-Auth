@@ -1,22 +1,22 @@
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
-import { randomUUID } from 'crypto';
-import { Response } from 'express';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp';
+import { isInitializeRequest } from '@modelcontextprotocol/sdk/types';
+import type { Response } from 'express';
+import { randomUUID } from 'node:crypto';
 
-import { McpServer } from '../mcp/McpServer';
-import { McpAuthenticatedRequest } from '../middlewares/McpAuthMiddleware';
+import type { McpServerFactory } from '../mcp/McpServerFactory';
+import type { McpAuthenticatedRequest } from '../middlewares/McpAuthMiddleware';
 
 interface Options {
-  mcpServer: McpServer;
+  mcpServerFactory: McpServerFactory;
 }
 
 export class McpStreamableController {
-  private readonly mcpServer: McpServer;
+  private readonly mcpServerFactory: McpServerFactory;
 
-  private readonly transportsMap: Map<string, StreamableHTTPServerTransport> = new Map();
+  private readonly transports: Map<string, StreamableHTTPServerTransport> = new Map();
 
-  constructor({ mcpServer }: Options) {
-    this.mcpServer = mcpServer;
+  constructor({ mcpServerFactory }: Options) {
+    this.mcpServerFactory = mcpServerFactory;
 
     this.postMcp = this.postMcp.bind(this);
     this.getMcp = this.getMcp.bind(this);
@@ -24,39 +24,54 @@ export class McpStreamableController {
   }
 
   public async postMcp(req: McpAuthenticatedRequest, res: Response): Promise<void> {
-    const sessionId = req.headers['mcp-session-id'];
-    let transport: StreamableHTTPServerTransport;
+    if (req.headers['mcp-session-id']) {
+      return this.handleSessionRequest(req, res);
+    }
 
-    if (sessionId && this.transportsMap.has(sessionId as string)) {
-      transport = this.transportsMap.get(sessionId as string) as StreamableHTTPServerTransport;
-    } else if (!sessionId && isInitializeRequest(req.body)) {
-      transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: () => randomUUID(),
-        onsessioninitialized: (sessionId) => {
-          this.transportsMap.set(sessionId, transport);
-        },
-      });
+    if (!req.auth?.extra?.studentId) {
+      res.status(401).send('Unauthorized');
+      return;
+    }
 
-      transport.onclose = () => {
-        if (transport.sessionId) {
-          this.transportsMap.delete(transport.sessionId);
-        }
-      };
-
-      await this.mcpServer.connect(transport);
-    } else {
+    if (!isInitializeRequest(req.body)) {
       res.status(400).json({
         jsonrpc: '2.0',
         error: {
           code: -32000,
-          message: 'Bad Request: No valid session ID provided',
+          message: 'Bad Request: No valid session ID provided and not an initialization request',
         },
         id: null,
       });
-
       return;
     }
 
+    const studentId = req.auth.extra.studentId;
+    const clientId = req.auth.clientId;
+
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+      onsessioninitialized: (sessionId) => {
+        // Composite key to bind the session ID to the student and client ID. Survives token refresh.
+        const transportKey = this.createTransportKey(studentId, clientId, sessionId);
+        this.transports.set(transportKey, transport);
+        console.log(`New Streamable transport "${transportKey}" connected`);
+      },
+    });
+
+    // Fires when the session terminates - via a client DELETE or an explicit transport close - not when any single
+    // response ends. A streamable session is owned by the transport and spans many separate requests, and its event
+    // stream can drop and reconnect without ending the session, so cleanup must be bound to session-level termination
+    // rather than to any one connection closing. This is invoked synchronously as part of closing the transport.
+    transport.onclose = () => {
+      if (transport.sessionId) {
+        const transportKey = this.createTransportKey(studentId, clientId, transport.sessionId);
+        this.transports.delete(transportKey);
+        console.log(`Streamable transport "${transportKey}" closed`);
+      }
+    };
+
+    const mcpServer = this.mcpServerFactory.create();
+    await mcpServer.connect(transport);
     await transport.handleRequest(req, res, req.body);
   }
 
@@ -68,16 +83,52 @@ export class McpStreamableController {
     return this.handleSessionRequest(req, res);
   }
 
-  private async handleSessionRequest(req: McpAuthenticatedRequest, res: Response): Promise<void> {
-    const sessionId = req.headers['mcp-session-id'];
+  /**
+   * Initiates shutdown of each streamable transport. Closing a transport ends its active streams, rejects pending
+   * outbound messages, and triggers session-level termination synchronously. As with SSE, this only begins disposal;
+   * the underlying sockets are not guaranteed to be closed until the HTTP server completes its own shutdown.
+   */
+  public async closeTransports(): Promise<void> {
+    for (const transport of this.transports.values()) {
+      await transport.close();
+    }
 
-    if (!sessionId || !this.transportsMap.has(sessionId as string)) {
-      res.status(400).send('Invalid or missing session ID');
+    this.transports.clear();
+  }
+
+  private createTransportKey(studentId: string, clientId: string, sessionId: string) {
+    return JSON.stringify([studentId, clientId, sessionId]);
+  }
+
+  private async handleSessionRequest(req: McpAuthenticatedRequest, res: Response): Promise<void> {
+    if (!req.auth?.extra?.studentId) {
+      res.status(401).send('Unauthorized');
       return;
     }
 
-    const transport = this.transportsMap.get(sessionId as string) as StreamableHTTPServerTransport;
+    const sessionId = req.headers['mcp-session-id'];
 
-    await transport.handleRequest(req, res);
+    if (!sessionId || typeof sessionId !== 'string') {
+      res.status(400).send('Missing or invalid session ID');
+      return;
+    }
+
+    const transportKey = this.createTransportKey(req.auth.extra.studentId, req.auth.clientId, sessionId);
+    const transport = this.transports.get(transportKey);
+
+    if (!transport) {
+      res.status(404).send(`No Streamable transport found for session "${sessionId}"`);
+      return;
+    }
+
+    const method = req.method.toUpperCase();
+
+    console.log(`Routing ${method} message to Streamable transport "${transportKey}"`);
+
+    if (method === 'POST') {
+      await transport.handleRequest(req, res, req.body);
+    } else {
+      await transport.handleRequest(req, res);
+    }
   };
 }

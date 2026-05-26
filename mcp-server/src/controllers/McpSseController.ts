@@ -23,14 +23,6 @@ export class McpSseController {
     this.postMessages = this.postMessages.bind(this);
   }
 
-  public async closeTransports(): Promise<void> {
-    for (const transport of this.transports.values()) {
-      await transport.close();
-    }
-
-    this.transports.clear();
-  }
-
   public async getSse(req: McpAuthenticatedRequest, res: Response): Promise<void> {
     if (!req.auth?.extra?.studentId) {
       res.status(401).send('Unauthorized');
@@ -43,9 +35,13 @@ export class McpSseController {
 
     this.transports.set(transportKey, transport);
 
+    // Fires when the underlying connection is actually torn down, regardless of whether the client disconnected or the
+    // response was ended from the server side. In SSE, a session corresponds to this one long-lived response, so this
+    // is the authoritative point at which the connection is gone - making the response-close event, not the transport,
+    // the correct place to drop the session.
     res.on('close', () => {
-      console.log(`SSE transport "${transportKey}" closed`);
       this.transports.delete(transportKey);
+      console.log(`SSE transport "${transportKey}" closed`);
     });
 
     const mcpServer = this.mcpServerFactory.create();
@@ -71,13 +67,27 @@ export class McpSseController {
     const transport = this.transports.get(transportKey);
 
     if (!transport) {
-      res.status(404).send(`No transport found for session "${sessionId}"`);
+      res.status(404).send(`No SSE transport found for session "${sessionId}"`);
       return;
     }
 
-    console.log(`Routing POST message to transport "${transportKey}"`);
+    console.log(`Routing POST message to SSE transport "${transportKey}"`);
 
     await transport.handlePostMessage(req, res);
+  }
+
+  /**
+   * Initiates shutdown of each SSE transport by ending its response, which signals the stream to close and rejects any
+   * pending outbound messages. This only starts disposal: it does not block until the OS sockets are gone. Final
+   * socket teardown happens on a later tick and is gated by the HTTP server's own shutdown, not by this method
+   * returning.
+   */
+  public async closeTransports(): Promise<void> {
+    for (const transport of this.transports.values()) {
+      await transport.close();
+    }
+
+    this.transports.clear();
   }
 
   private createTransportKey(studentId: string, clientId: string, sessionId: string) {
