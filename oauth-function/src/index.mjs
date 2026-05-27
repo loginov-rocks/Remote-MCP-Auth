@@ -1,13 +1,13 @@
+import { getAuthorizationServerMetadataHandler } from './getAuthorizationServerMetadataHandler.mjs';
 import { getAuthorizeHandler } from './getAuthorizeHandler.mjs';
 import { getHandler } from './getHandler.mjs';
-import { getWellKnownHandler } from './getWellKnownHandler.mjs';
 import { postAuthorizeHandler } from './postAuthorizeHandler.mjs';
 import { postRegisterHandler } from './postRegisterHandler.mjs';
 import { postTokenHandler } from './postTokenHandler.mjs';
 
 const routes = [
   { method: 'get', path: '/', handler: getHandler },
-  { method: 'get', path: '/.well-known/oauth-authorization-server', handler: getWellKnownHandler },
+  { method: 'get', path: '/.well-known/oauth-authorization-server', handler: getAuthorizationServerMetadataHandler },
   { method: 'post', path: '/oauth/register', handler: postRegisterHandler },
   { method: 'get', path: '/oauth/authorize', handler: getAuthorizeHandler },
   { method: 'post', path: '/oauth/authorize', handler: postAuthorizeHandler },

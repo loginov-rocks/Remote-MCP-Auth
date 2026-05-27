@@ -1,10 +1,20 @@
-export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-export const ACCESS_TOKEN_TTL = parseInt(process.env.ACCESS_TOKEN_TTL, 10); // in seconds
+function requireEnv(name) {
+  const value = process.env[name];
 
-export const AUTH_CODES_TABLE_NAME = process.env.AUTH_CODES_TABLE_NAME;
-export const AUTH_CODES_TTL = parseInt(process.env.AUTH_CODES_TTL, 10); // in seconds
+  if (!value) {
+    throw new Error(`Missing required environment variable "${name}"`);
+  }
 
-export const AUTHORIZATION_SERVER_BASE_URL = process.env.AUTHORIZATION_SERVER_BASE_URL;
+  return value;
+}
 
-export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-export const REFRESH_TOKEN_TTL = parseInt(process.env.REFRESH_TOKEN_TTL, 10); // in seconds
+export const ACCESS_TOKEN_SECRET = requireEnv('ACCESS_TOKEN_SECRET');
+export const ACCESS_TOKEN_TTL = parseInt(requireEnv('ACCESS_TOKEN_TTL'), 10); // in seconds
+
+export const AUTH_CODES_TABLE_NAME = requireEnv('AUTH_CODES_TABLE_NAME');
+export const AUTH_CODES_TTL = parseInt(requireEnv('AUTH_CODES_TTL'), 10); // in seconds
+
+export const CLIENTS_TABLE_NAME = requireEnv('AUTH_CODES_TABLE_NAME');
+
+export const REFRESH_TOKEN_SECRET = requireEnv('REFRESH_TOKEN_SECRET');
+export const REFRESH_TOKEN_TTL = parseInt(requireEnv('REFRESH_TOKEN_TTL'), 10); // in seconds

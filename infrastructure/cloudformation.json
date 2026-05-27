@@ -117,6 +117,27 @@
         }
       }
     },
+    "ClientsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "TableName": {
+          "Fn::Sub": "${AWS::StackName}-clients-table"
+        }
+      }
+    },
     "OAuthFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -176,12 +197,20 @@
                     "dynamodb:PutItem"
                   ],
                   "Effect": "Allow",
-                  "Resource": {
-                    "Fn::GetAtt": [
-                      "AuthCodesTable",
-                      "Arn"
-                    ]
-                  }
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "AuthCodesTable",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "ClientsTable",
+                        "Arn"
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -216,11 +245,8 @@
             "AUTH_CODES_TTL": {
               "Ref": "AuthCodesTtl"
             },
-            "AUTHORIZATION_SERVER_BASE_URL": {
-              "Fn::GetAtt": [
-                "ApiGateway",
-                "ApiEndpoint"
-              ]
+            "CLIENTS_TABLE_NAME": {
+              "Ref": "ClientsTable"
             },
             "REFRESH_TOKEN_SECRET": {
               "Ref": "RefreshTokenSecret"
