@@ -1,7 +1,9 @@
 import { json, type Request, type Response, Router } from 'express';
 
 import { PROTECTED_RESOURCE_METADATA_ROUTE, SSE_MESSAGES_ROUTE } from './constants';
-import { mcpAuthMiddleware, mcpSseController, mcpStreamableController, oauthController } from './container';
+import {
+  mcpAuthMiddleware, mcpSseController, mcpStatelessController, mcpStreamableController, oauthController,
+} from './container';
 
 export const router = Router();
 
@@ -10,14 +12,19 @@ router.get('/', (req: Request, res: Response) => {
   res.send('OK');
 });
 
-// SSE.
-router.get('/sse', mcpAuthMiddleware.requireAuth, mcpSseController.getSse);
-router.post(SSE_MESSAGES_ROUTE, mcpAuthMiddleware.requireAuth, mcpSseController.postMessages);
-
 // Streamable HTTP.
 router.post('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableController.postMcp);
 router.get('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableController.getMcp);
 router.delete('/mcp', mcpAuthMiddleware.requireAuth, json(), mcpStreamableController.deleteMcp);
+
+// Stateless Streamable HTTP.
+router.post('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessController.postMcp);
+router.get('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessController.getMcp);
+router.delete('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessController.deleteMcp);
+
+// HTTP+SSE (deprecated).
+router.get('/sse', mcpAuthMiddleware.requireAuth, mcpSseController.getSse);
+router.post(SSE_MESSAGES_ROUTE, mcpAuthMiddleware.requireAuth, mcpSseController.postMessages);
 
 // Auth-related.
 router.get(PROTECTED_RESOURCE_METADATA_ROUTE, oauthController.getProtectedResourceMetadata);

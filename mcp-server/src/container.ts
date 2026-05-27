@@ -3,6 +3,7 @@ import {
 } from './constants';
 
 import { McpSseController } from './controllers/McpSseController';
+import { McpStatelessController } from './controllers/McpStatelessController';
 import { McpStreamableController } from './controllers/McpStreamableController';
 import { OAuthController } from './controllers/OAuthController';
 
@@ -40,6 +41,10 @@ export const mcpSseController = new McpSseController({
   mcpServerFactory,
   sseMessagesRoute: SSE_MESSAGES_ROUTE,
 })
+
+export const mcpStatelessController = new McpStatelessController({
+  mcpServerFactory,
+});
 
 export const mcpStreamableController = new McpStreamableController({
   mcpServerFactory,
