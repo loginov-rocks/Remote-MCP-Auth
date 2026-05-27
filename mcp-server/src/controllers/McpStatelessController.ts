@@ -1,5 +1,6 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp';
 import type { Response } from 'express';
+import { randomUUID } from 'node:crypto';
 
 import type { McpServerFactory } from '../mcp/McpServerFactory';
 import type { McpAuthenticatedRequest } from '../middlewares/McpAuthMiddleware';
@@ -20,7 +21,8 @@ export class McpStatelessController {
   }
 
   public async postMcp(req: McpAuthenticatedRequest, res: Response): Promise<void> {
-    console.log('New Stateless Streamable transport connected');
+    const uuid = randomUUID();
+    console.log(`New Stateless Streamable transport "${uuid}" connected`);
 
     const transport = new StreamableHTTPServerTransport();
     const mcpServer = this.mcpServerFactory.create();
@@ -32,10 +34,13 @@ export class McpStatelessController {
     // work - so there is no need to close the server on its own. Attached before connect, so cleanup still runs if
     // connect or the request handling throws.
     res.on('close', () => {
-      transport.close().catch((error) => {
-        console.error('Failed to close Stateless Streamable transport', error);
-      });
-      console.log('Stateless Streamable transport closed');
+      transport.close()
+        .then(() => {
+          console.log(`Stateless Streamable transport "${uuid}" closed`);
+        })
+        .catch((error) => {
+          console.error(`Failed to close Stateless Streamable transport "${uuid}"`, error);
+        });
     });
 
     await mcpServer.connect(transport);

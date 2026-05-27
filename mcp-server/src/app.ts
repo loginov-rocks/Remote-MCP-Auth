@@ -9,17 +9,26 @@ const app = express();
 app.use(router);
 
 const server = app.listen(PORT, () => {
-  console.log(`App started on port ${PORT}`);
+  console.log(`MCP server started on port ${PORT}`);
 });
 
-async function shutdown(): Promise<void> {
-  console.log('Shutting down server...');
+let isShuttingDown = false;
 
+async function shutdown(): Promise<void> {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
+
+  console.log('Shutting down MCP server...');
+
+  // Can be parallelized.
   await mcpSseController.closeTransports();
   await mcpStreamableController.closeTransports();
 
   server.close(() => {
-    console.log('Server shutdown complete');
+    console.log('MCP server shutdown complete');
     process.exit(0);
   });
 

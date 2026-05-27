@@ -83,8 +83,13 @@ export class McpSseController {
    * returning.
    */
   public async closeTransports(): Promise<void> {
+    // Can be parallelized.
     for (const transport of this.transports.values()) {
-      await transport.close();
+      try {
+        await transport.close();
+      } catch (error) {
+        console.error(`Failed to close SSE transport with session ID "${transport.sessionId}"`, error);
+      }
     }
 
     this.transports.clear();

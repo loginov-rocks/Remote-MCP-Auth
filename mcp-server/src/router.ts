@@ -22,12 +22,12 @@ router.post('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessCon
 router.get('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessController.getMcp);
 router.delete('/stateless', mcpAuthMiddleware.requireAuth, json(), mcpStatelessController.deleteMcp);
 
-// HTTP+SSE (deprecated).
+// HTTP+SSE (deprecated), notice no json() middleware used here, because SSE transport reads a raw stream.
 router.get('/sse', mcpAuthMiddleware.requireAuth, mcpSseController.getSse);
 router.post(SSE_MESSAGES_ROUTE, mcpAuthMiddleware.requireAuth, mcpSseController.postMessages);
 
 // Auth-related.
 router.get(PROTECTED_RESOURCE_METADATA_ROUTE, oauthController.getProtectedResourceMetadata);
-// Deprecated as per 2025-06-18 Authorization spec, this endpoint should be provided by the authorization server, not
-// by the MCP server. Leaving for backward compatibility.
+// Deprecated as per 2025-06-18 Authorization spec, this endpoint should be provided by the authorization server only,
+// not by the MCP server. Leaving for backward compatibility.
 router.get('/.well-known/oauth-authorization-server', oauthController.getAuthorizationServerMetadata);

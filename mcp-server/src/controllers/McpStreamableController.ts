@@ -89,8 +89,13 @@ export class McpStreamableController {
    * the underlying sockets are not guaranteed to be closed until the HTTP server completes its own shutdown.
    */
   public async closeTransports(): Promise<void> {
+    // Can be parallelized.
     for (const transport of this.transports.values()) {
-      await transport.close();
+      try {
+        await transport.close();
+      } catch (error) {
+        console.error(`Failed to close Streamable transport with session ID "${transport.sessionId}"`, error);
+      }
     }
 
     this.transports.clear();
