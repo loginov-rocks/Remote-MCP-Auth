@@ -2,7 +2,6 @@ import { createClient } from './clients.mjs';
 
 export async function postRegisterHandler(event) {
   const params = JSON.parse(event.body);
-
   console.log('postRegisterParams', JSON.stringify(params));
 
   let client;
