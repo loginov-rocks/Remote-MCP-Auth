@@ -1,27 +1,16 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 
 import { AUTH_CODES_TABLE_NAME, AUTH_CODES_TTL } from './constants.mjs';
 
 const dynamoDbClient = new DynamoDBClient();
 const dynamoDbDocumentClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
-const generateCode = () => randomBytes(32).toString('hex');
-
-export const createCode = async (studentId, codeChallenge, scope) => {
-  const code = generateCode();
-
-  const now = Math.floor(Date.now() / 1000);
-  const expiration = now + AUTH_CODES_TTL;
-
-  const item = {
-    code,
-    codeChallenge,
-    expiration,
-    studentId,
-    scope,
-  };
+export async function createCode({ clientId, codeChallenge, redirectUri, resource, scope, studentId }) {
+  const code = randomBytes(32).toString('hex');
+  const expiration = Math.floor(Date.now() / 1000) + AUTH_CODES_TTL;
+  const item = { code, expiration, clientId, codeChallenge, redirectUri, resource, scope, studentId };
 
   const putCommand = new PutCommand({
     Item: item,
@@ -30,10 +19,10 @@ export const createCode = async (studentId, codeChallenge, scope) => {
 
   await dynamoDbDocumentClient.send(putCommand);
 
-  return code;
+  return item;
 };
 
-export const deleteCode = (code) => {
+export function deleteCode(code) {
   const deleteCommand = new DeleteCommand({
     Key: { code },
     TableName: AUTH_CODES_TABLE_NAME,
@@ -42,7 +31,7 @@ export const deleteCode = (code) => {
   return dynamoDbDocumentClient.send(deleteCommand);
 }
 
-export const findCode = async (code) => {
+export async function findCode(code) {
   const getCommand = new GetCommand({
     Key: { code },
     TableName: AUTH_CODES_TABLE_NAME,

@@ -6,7 +6,11 @@ export async function postRegisterHandler(event) {
 
   let client;
   try {
-    client = await createClient(params.redirect_uris, params.client_name, params.scope);
+    client = await createClient({
+      name: params.client_name,
+      redirectUris: params.redirect_uris,
+      scope: params.scope,
+    });
   } catch (error) {
     console.error(error);
     return { statusCode: 500 };

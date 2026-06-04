@@ -7,10 +7,10 @@ import { CLIENTS_TABLE_NAME } from './constants.mjs';
 const dynamoDbClient = new DynamoDBClient();
 const dynamoDbDocumentClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
-export async function createClient(redirectUris, name, scope) {
+export async function createClient({ name, redirectUris, scope }) {
   const id = randomUUID();
   const issuedAt = Math.floor(Date.now() / 1000);
-  const item = { id, issuedAt, redirectUris, name, scope };
+  const item = { id, issuedAt, name, redirectUris, scope };
 
   const putCommand = new PutCommand({
     Item: item,
