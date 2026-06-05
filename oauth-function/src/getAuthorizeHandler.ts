@@ -71,7 +71,7 @@ export async function getAuthorizeHandler(event: APIGatewayProxyEventV2): Promis
     <h1>Authorize <strong>${esc(client.name)}</strong></h1>
     <p><strong>${esc(client.name)}</strong> wants to access your <strong>Battle School Computer</strong> account.</p>
     <form action="${POST_AUTHORIZE_ROUTE}" method="post">
-      <input name="student_id" placeholder="Student ID" required>
+      <input name="student_id" placeholder="Student ID">
       <input type="hidden" name="client_id" value="${esc(params.client_id)}">
       <input type="hidden" name="code_challenge" value="${esc(params.code_challenge)}">
       <input type="hidden" name="code_challenge_method" value="${esc(params.code_challenge_method)}">

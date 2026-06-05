@@ -19,8 +19,7 @@ export function getAuthorizationServerMetadataHandler(event: APIGatewayProxyEven
       token_endpoint_auth_methods_supported: ['none'], // MCP clients are public (no secret), so the token endpoint accepts them without client auth - PKCE is what protects the exchange
       code_challenge_methods_supported: ['S256'], // require PKCE with SHA-256; mandatory for public clients
       authorization_response_iss_parameter_supported: true, // RFC 9207: echoes `iss` in the auth response so clients confirm which server replied - guards against mix-up attacks
-      // TODO
-      // client_id_metadata_document_supported: true, // clients can use a URL as their client_id (points to their metadata doc) instead of pre-registering - the lightweight path for MCP
+      client_id_metadata_document_supported: true, // clients can use a URL as their client_id (points to their metadata doc) instead of pre-registering - the lightweight path for MCP
     }),
   };
 }
