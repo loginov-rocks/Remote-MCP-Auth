@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 
-import { findClient } from './clients.ts';
+import { findClient, isRedirectUriAllowed } from './clients.ts';
 
 const POST_AUTHORIZE_ROUTE = '/oauth/authorize';
 
@@ -50,7 +50,7 @@ export async function getAuthorizeHandler(event: APIGatewayProxyEventV2): Promis
 
   // Error example: the client is valid but the redirect_uri isn't one it registered - the client is fine, a request
   // parameter is wrong, so per the specification the error is invalid_request.
-  if (!client.redirectUris.includes(params.redirect_uri)) {
+  if (!isRedirectUriAllowed(client.redirectUris, params.redirect_uri)) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },

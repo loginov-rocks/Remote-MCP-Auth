@@ -111,3 +111,42 @@ export function findClient(clientId: string): Promise<Client | null> {
 
   return findRegisteredClient(clientId);
 }
+
+/**
+ * Validates a requested redirect_uri against a client's registered URIs. Loopback URIs ignore the port: a local client
+ * like Claude Code binds a random port at runtime, which RFC 8252 (adopted by the MCP auth spec) requires the server
+ * to allow. All other URIs need an exact match.
+ */
+export function isRedirectUriAllowed(registeredUris: string[], requestedUri: string): boolean {
+  if (registeredUris.includes(requestedUri)) {
+    return true;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(requestedUri);
+  } catch {
+    return false;
+  }
+
+  const loopbackHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+  if (url.protocol !== 'http:' || !loopbackHosts.has(url.hostname)) {
+    return false;
+  }
+
+  url.port = '';
+
+  return registeredUris.some((uri) => {
+    let registered: URL;
+    try {
+      registered = new URL(uri);
+    } catch {
+      return false;
+    }
+
+    registered.port = '';
+
+    return registered.href === url.href;
+  });
+}

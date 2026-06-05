@@ -1,7 +1,7 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 
 import { createAuthCode } from './authCodes.ts';
-import { findClient } from './clients.ts';
+import { findClient, isRedirectUriAllowed } from './clients.ts';
 
 export async function postAuthorizeHandler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
   if (!event.body) {
@@ -18,7 +18,7 @@ export async function postAuthorizeHandler(event: APIGatewayProxyEventV2): Promi
 
   // Error example: these values come from the submitted form and aren't verified yet, so there's no trusted callback
   // to redirect to - the error is returned directly per the specification.
-  if (!client || !client.redirectUris.includes(params.redirect_uri)) {
+  if (!client || !isRedirectUriAllowed(client.redirectUris, params.redirect_uri)) {
     return { statusCode: 400 };
   }
 
