@@ -2,18 +2,17 @@
   "version": "2.0",
   "routeKey": "$default",
   "rawPath": "/oauth/authorize",
-  "rawQueryString": "response_type=code&client_id=98f974d2-5ab1-467d-b043-64edbb2a840b&redirect_uri=https%3A%2F%2Fclaude.ai%2Fapi%2Fmcp%2Fauth_callback&scope=claudeai&code_challenge=qpxvR2wuni9VNrukgHOgVqGc1WljDfVbDFIYtwmKeos&code_challenge_method=S256&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts",
+  "rawQueryString": "response_type=code&client_id=98f974d2-5ab1-467d-b043-64edbb2a840b&redirect_uri=https%3A%2F%2Fclaude.ai%2Fapi%2Fmcp%2Fauth_callback&code_challenge=qpxvR2wuni9VNrukgHOgVqGc1WljDfVbDFIYtwmKeos&code_challenge_method=S256&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts&resource=https%3A%2F%2Fmcp.us-west1.run.app%2F",
   "headers": {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "accept-encoding": "gzip, deflate, br",
+    "accept-encoding": "gzip, deflate, br, zstd",
     "accept-language": "en-US,en;q=0.9",
     "content-length": "0",
     "host": "abc123.execute-api.us-east-1.amazonaws.com",
     "priority": "u=0, i",
-    "referer": "https://claude.ai/",
     "sec-fetch-dest": "document",
     "sec-fetch-mode": "navigate",
-    "sec-fetch-site": "cross-site",
+    "sec-fetch-site": "none",
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15",
     "x-amzn-trace-id": "Root=1-68426b50-6d3397dc48c1b1d82acef3cb",
     "x-forwarded-for": "76.168.99.91",
@@ -25,8 +24,8 @@
     "code_challenge": "qpxvR2wuni9VNrukgHOgVqGc1WljDfVbDFIYtwmKeos",
     "code_challenge_method": "S256",
     "redirect_uri": "https://claude.ai/api/mcp/auth_callback",
+    "resource": "https://mcp.us-west1.run.app/",
     "response_type": "code",
-    "scope": "claudeai",
     "state": "MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts"
   },
   "requestContext": {
@@ -44,8 +43,8 @@
     "requestId": "LuW0qgMboAMES4A=",
     "routeKey": "$default",
     "stage": "$default",
-    "time": "06/Jun/2025:04:15:12 +0000",
-    "timeEpoch": 1749183312654
+    "time": "05/Jun/2026:18:55:45 +0000",
+    "timeEpoch": 1780685745573
   },
   "isBase64Encoded": false
 }

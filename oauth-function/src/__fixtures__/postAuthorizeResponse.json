@@ -1,6 +1,6 @@
 {
   "statusCode": 302,
   "headers": {
-    "Location": "https://claude.ai/api/mcp/auth_callback?code=7fc8cde3ddaf6b0488368ffa2e4f3b31861c0e98630c36a07582ca19148338d2&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts"
+    "Location": "https://claude.ai/api/mcp/auth_callback?iss=https%3A%2F%2Fabc123.execute-api.us-east-1.amazonaws.com&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts&code=7fc8cde3ddaf6b0488368ffa2e4f3b31861c0e98630c36a07582ca19148338d2"
   }
 }

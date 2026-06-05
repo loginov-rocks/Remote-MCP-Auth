@@ -3,5 +3,5 @@
   "headers": {
     "Content-Type": "application/json"
   },
-  "body": "{\"issuer\":\"https://abc123.execute-api.us-east-1.amazonaws.com\",\"authorization_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/authorize\",\"token_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/token\",\"registration_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/register\",\"grant_types_supported\":[\"authorization_code\",\"client_credentials\"],\"code_challenge_methods_supported\":[\"S256\"]}"
+  "body": "{\"issuer\":\"https://abc123.execute-api.us-east-1.amazonaws.com\",\"authorization_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/authorize\",\"token_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/token\",\"registration_endpoint\":\"https://abc123.execute-api.us-east-1.amazonaws.com/oauth/register\",\"response_types_supported\":[\"code\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"token_endpoint_auth_methods_supported\":[\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"authorization_response_iss_parameter_supported\":true}"
 }

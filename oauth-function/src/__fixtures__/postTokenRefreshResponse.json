@@ -1,7 +1,8 @@
 {
   "statusCode": 200,
   "headers": {
+    "Cache-Control": "no-store",
     "Content-Type": "application/json"
   },
-  "body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCUy0yNDAxIiwiZXhwIjoxNzUxNjYxNjQzfQ.4OVst6UjErHE8K4rcF6V7zrfGqXszuNsNYcndl3MrhQ\",\"token_type\":\"Bearer\",\"expires_in\":900,\"refresh_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCUy0yNDAxIiwiZXhwIjoxNzU0MjUyNzQzfQ.uy7z6DEQ1Cv18kOhA1XLpFmlUQGkpxrb8FSPCTaHQgA\",\"scope\":\"claudeai\"}"
+  "body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCUy0yNDAxIiwiZXhwIjoxNzUxNjYxNjQzfQ.4OVst6UjErHE8K4rcF6V7zrfGqXszuNsNYcndl3MrhQ\",\"token_type\":\"Bearer\",\"expires_in\":900,\"refresh_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCUy0yNDAxIiwiZXhwIjoxNzU0MjUyNzQzfQ.uy7z6DEQ1Cv18kOhA1XLpFmlUQGkpxrb8FSPCTaHQgA\"}"
 }

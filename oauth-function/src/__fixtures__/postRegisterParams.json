@@ -1,5 +1,8 @@
 {
-  "client_name": "claudeai",
+  "redirect_uris": [
+    "https://claude.ai/api/mcp/auth_callback"
+  ],
+  "token_endpoint_auth_method": "none",
   "grant_types": [
     "authorization_code",
     "refresh_token"
@@ -7,9 +10,5 @@
   "response_types": [
     "code"
   ],
-  "token_endpoint_auth_method": "none",
-  "scope": "claudeai",
-  "redirect_uris": [
-    "https://claude.ai/api/mcp/auth_callback"
-  ]
+  "client_name": "Claude"
 }

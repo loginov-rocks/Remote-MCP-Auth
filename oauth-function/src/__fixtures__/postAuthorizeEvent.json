@@ -5,14 +5,14 @@
   "rawQueryString": "",
   "headers": {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "accept-encoding": "gzip, deflate, br",
+    "accept-encoding": "gzip, deflate, br, zstd",
     "accept-language": "en-US,en;q=0.9",
     "content-length": "300",
     "content-type": "application/x-www-form-urlencoded",
     "host": "abc123.execute-api.us-east-1.amazonaws.com",
     "origin": "https://abc123.execute-api.us-east-1.amazonaws.com",
     "priority": "u=0, i",
-    "referer": "https://abc123.execute-api.us-east-1.amazonaws.com/oauth/authorize?response_type=code&client_id=98f974d2-5ab1-467d-b043-64edbb2a840b&redirect_uri=https%3A%2F%2Fclaude.ai%2Fapi%2Fmcp%2Fauth_callback&scope=claudeai&code_challenge=qpxvR2wuni9VNrukgHOgVqGc1WljDfVbDFIYtwmKeos&code_challenge_method=S256&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts",
+    "referer": "https://abc123.execute-api.us-east-1.amazonaws.com/oauth/authorize?response_type=code&client_id=98f974d2-5ab1-467d-b043-64edbb2a840b&redirect_uri=https%3A%2F%2Fclaude.ai%2Fapi%2Fmcp%2Fauth_callback&code_challenge=qpxvR2wuni9VNrukgHOgVqGc1WljDfVbDFIYtwmKeos&code_challenge_method=S256&state=MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts&resource=https%3A%2F%2Fmcp.us-west1.run.app%2F",
     "sec-fetch-dest": "document",
     "sec-fetch-mode": "navigate",
     "sec-fetch-site": "same-origin",
@@ -37,8 +37,8 @@
     "requestId": "LuW9RhFiIAMESCw=",
     "routeKey": "$default",
     "stage": "$default",
-    "time": "06/Jun/2025:04:16:07 +0000",
-    "timeEpoch": 1749183367722
+    "time": "05/Jun/2026:18:55:52 +0000",
+    "timeEpoch": 1780685752777
   },
   "body": "c3R1ZGVudF9pZD1CUy0yNDAxJmNsaWVudF9pZD05OGY5NzRkMi01YWIxLTQ2N2QtYjA0My02NGVkYmIyYTg0MGImY29kZV9jaGFsbGVuZ2U9cXB4dlIyd3VuaTlWTnJ1a2dIT2dWcUdjMVdsakRmVmJERklZdHdtS2VvcyZjb2RlX2NoYWxsZW5nZV9tZXRob2Q9UzI1NiZyZWRpcmVjdF91cmk9aHR0cHMlM0ElMkYlMkZjbGF1ZGUuYWklMkZhcGklMkZtY3AlMkZhdXRoX2NhbGxiYWNrJnJlc3BvbnNlX3R5cGU9Y29kZSZzY29wZT1jbGF1ZGVhaSZzdGF0ZT1NQXRhaUJaV1dtbU52akdhREZFaUx1QWJTdl9GVUozazkxWFluV2NacHRz",
   "isBase64Encoded": true

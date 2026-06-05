@@ -5,6 +5,8 @@
   "code_challenge_method": "S256",
   "redirect_uri": "https://claude.ai/api/mcp/auth_callback",
   "response_type": "code",
-  "scope": "claudeai",
-  "state": "MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts"
+  "resource": "https://mcp.us-west1.run.app",
+  "scope": "",
+  "state": "MAtaiBZWWmmNvjGaDFEiLuAbSv_FUJ3k91XYnWcZpts",
+  "decision": "allow"
 }

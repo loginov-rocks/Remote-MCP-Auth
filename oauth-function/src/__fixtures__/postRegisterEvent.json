@@ -5,12 +5,12 @@
   "rawQueryString": "",
   "headers": {
     "accept": "*/*",
-    "accept-encoding": "gzip, deflate, br",
-    "content-length": "232",
+    "accept-encoding": "gzip, deflate, br, zstd",
+    "content-length": "199",
     "content-type": "application/json",
     "host": "abc123.execute-api.us-east-1.amazonaws.com",
     "traceparent": "00-eb8f92cbedb2a8ce2986d8d2f2e6b56a-746e65b069ba57cc-01",
-    "user-agent": "python-httpx/0.27.0",
+    "user-agent": "python-httpx/0.28.1",
     "x-amzn-trace-id": "Root=1-68426b50-1b03cb0a74cc4b3b3f7d728a",
     "x-cloud-trace-context": "eb8f92cbedb2a8ce2986d8d2f2e6b56a/8389754964200282060;o=1",
     "x-forwarded-for": "34.162.102.82",
@@ -32,9 +32,9 @@
     "requestId": "LuW0kh4JIAMESsg=",
     "routeKey": "$default",
     "stage": "$default",
-    "time": "06/Jun/2025:04:15:12 +0000",
-    "timeEpoch": 1749183312016
+    "time": "05/Jun/2026:18:55:43 +0000",
+    "timeEpoch": 1780685743953
   },
-  "body": "{\"client_name\": \"claudeai\", \"grant_types\": [\"authorization_code\", \"refresh_token\"], \"response_types\": [\"code\"], \"token_endpoint_auth_method\": \"none\", \"scope\": \"claudeai\", \"redirect_uris\": [\"https://claude.ai/api/mcp/auth_callback\"]}",
+  "body": "{\"redirect_uris\":[\"https://claude.ai/api/mcp/auth_callback\"],\"token_endpoint_auth_method\":\"none\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"response_types\":[\"code\"],\"client_name\":\"Claude\"}",
   "isBase64Encoded": false
 }

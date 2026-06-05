@@ -4,13 +4,13 @@
   "rawPath": "/oauth/token",
   "rawQueryString": "",
   "headers": {
-    "accept": "*/*",
-    "accept-encoding": "gzip, deflate, br",
+    "accept": "application/json",
+    "accept-encoding": "gzip, deflate, br, zstd",
     "content-length": "213",
     "content-type": "application/x-www-form-urlencoded",
     "host": "abc123.execute-api.us-east-1.amazonaws.com",
     "traceparent": "00-41b1d96fa83ea25ee17ee7d67e7b9df8-019f4392385722f0-01",
-    "user-agent": "python-httpx/0.27.0",
+    "user-agent": "python-httpx/0.28.1",
     "x-amzn-trace-id": "Root=1-68426b88-5e23fcb1142bc42959c893bb",
     "x-cloud-trace-context": "41b1d96fa83ea25ee17ee7d67e7b9df8/116886410624443120;o=1",
     "x-forwarded-for": "34.162.46.92",
@@ -27,13 +27,13 @@
       "path": "/oauth/token",
       "protocol": "HTTP/1.1",
       "sourceIp": "34.162.46.92",
-      "userAgent": "python-httpx/0.27.0"
+      "userAgent": "python-httpx/0.28.1"
     },
     "requestId": "LuW9XhwcoAMEPDA=",
     "routeKey": "$default",
     "stage": "$default",
-    "time": "06/Jun/2025:04:16:08 +0000",
-    "timeEpoch": 1749183368314
+    "time": "05/Jun/2026:19:37:10 +0000",
+    "timeEpoch": 1780688230601
   },
   "body": "Z3JhbnRfdHlwZT1yZWZyZXNoX3Rva2VuJnJlZnJlc2hfdG9rZW49ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnpkV0lpT2lKQ1V5MHlOREF4SWl3aVpYaHdJam94TnpVME1qVXhOemcxZlEuYnRaNVZWQjRFUDdrbzRJZFY2QlRpWVctN0NlTjFPUUtMcDhDRjBFRGNxUSZjbGllbnRfaWQ9OThmOTc0ZDItNWFiMS00NjdkLWIwNDMtNjRlZGJiMmE4NDBi",
   "isBase64Encoded": true

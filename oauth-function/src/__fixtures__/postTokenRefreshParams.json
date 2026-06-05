@@ -1,5 +1,6 @@
 {
   "grant_type": "refresh_token",
   "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCUy0yNDAxIiwiZXhwIjoxNzU0MjUxNzg1fQ.btZ5VVB4EP7ko4IdV6BTiYW-7CeN1OQKLp8CF0EDcqQ",
-  "client_id": "98f974d2-5ab1-467d-b043-64edbb2a840b"
+  "client_id": "98f974d2-5ab1-467d-b043-64edbb2a840b",
+  "resource": "https://mcp.us-west1.run.app"
 }

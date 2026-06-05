@@ -3,5 +3,6 @@
   "code": "7fc8cde3ddaf6b0488368ffa2e4f3b31861c0e98630c36a07582ca19148338d2",
   "client_id": "98f974d2-5ab1-467d-b043-64edbb2a840b",
   "code_verifier": "j8js9GUnRzJoeYlxicRtL4xtkm2-9TRtf1rilRyhnNU",
-  "redirect_uri": "https://claude.ai/api/mcp/auth_callback"
+  "redirect_uri": "https://claude.ai/api/mcp/auth_callback",
+  "resource": "https://mcp.us-west1.run.app"
 }

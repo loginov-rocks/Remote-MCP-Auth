@@ -5,12 +5,12 @@
   "rawQueryString": "",
   "headers": {
     "accept": "*/*",
-    "accept-encoding": "gzip, deflate, br",
+    "accept-encoding": "gzip, deflate, br, zstd",
     "content-length": "0",
     "host": "abc123.execute-api.us-east-1.amazonaws.com",
-    "mcp-protocol-version": "2024-11-05",
+    "mcp-protocol-version": "2025-11-25",
     "traceparent": "00-eb8f92cbedb2a8ce2986d8d2f2e6b56a-238e04af1ddb48b5-01",
-    "user-agent": "python-httpx/0.27.0",
+    "user-agent": "python-httpx/0.28.1",
     "x-amzn-trace-id": "Root=1-68426b4f-704ccbee1c35174c3feed545",
     "x-cloud-trace-context": "eb8f92cbedb2a8ce2986d8d2f2e6b56a/2561990388187089077;o=1",
     "x-forwarded-for": "34.162.102.82",
@@ -27,13 +27,13 @@
       "path": "/.well-known/oauth-authorization-server",
       "protocol": "HTTP/1.1",
       "sourceIp": "34.162.102.82",
-      "userAgent": "python-httpx/0.27.0"
+      "userAgent": "python-httpx/0.28.1"
     },
     "requestId": "LuW0iiBxIAMEPrw=",
     "routeKey": "$default",
     "stage": "$default",
-    "time": "06/Jun/2025:04:15:11 +0000",
-    "timeEpoch": 1749183311881
+    "time": "05/Jun/2026:18:55:43 +0000",
+    "timeEpoch": 1780685743134
   },
   "isBase64Encoded": false
 }
