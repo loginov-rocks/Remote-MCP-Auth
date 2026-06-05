@@ -43,8 +43,8 @@ production considerations throughout the implementation.
    that demonstrate user-specific and public data access patterns.
 8. **Claude Integration:** tested and verified to work seamlessly with Claude's remote MCP integrations.
 9. **Comprehensive Examples:** includes real request/response
-   [fixtures](https://github.com/loginov-rocks/Remote-MCP-Auth/tree/main/oauth-function/src/__fixtures__) captured
-   from Claude sessions.
+   [fixtures](https://github.com/loginov-rocks/Remote-MCP-Auth/tree/main/authorization-server/src/__fixtures__)
+   captured from Claude sessions.
 10. **Infrastructure as Code:** complete
     [CloudFormation template](https://github.com/loginov-rocks/Remote-MCP-Auth/blob/main/infrastructure/cloudformation.json)
     for **AWS** deployment with automated **DynamoDB** setup, **API Gateway**, and **Lambda** configuration for the
@@ -56,10 +56,10 @@ production considerations throughout the implementation.
 
 1. Deploy `infrastructure/cloudformation.json` template.
 2. Note `ApiUrl` from "Outputs" tab (`https://abc123.execute-api.us-east-1.amazonaws.com`).
-3. Go to `oauth-function`, upload files from `oauth-funtion/src` (except `__fixtures__`). Note the source files are
-   using `.mjs` extension, not `.js`. You can also use `npm run package` command to prepare zip for uploading through
+3. Go to `authorization-server`, upload files from `authorization-server/src` (except `__fixtures__`). Note the source
+   files are using `.mjs` extension, not `.js`. You can also use `npm run package` command to prepare zip for uploading through
    the AWS console.
-4. Deploy the `oauth-function` with updated source code.
+4. Deploy the `authorization-server` with updated source code.
 
 ### API
 
@@ -73,14 +73,14 @@ Endpoints deployed, optionally test with Postman:
 * `POST https://abc123.execute-api.us-east-1.amazonaws.com/oauth/token`
 
 You can find the exact query string parameters and payloads sent by Claude for each request in
-`oauth-funtion/src/__fixtures__`.
+`authorization-server/src/__fixtures__`.
 
 ### Claude
 
 1. Open "Settings" -> "Integrations" in Claude, click on "Add integraton".
 2. Enter integration name, paste integration URL (`https://abc123.execute-api.us-east-1.amazonaws.com`) and click on
    "Add".
-3. Click on "Connect", this will redirect to the authorization page provided by the **OAuth Function**.
+3. Click on "Connect", this will redirect to the authorization page provided by the **Authorization Server**.
 4. Click "Authorize", this will redirect back to Claude.
 5. Claude should confirm successful connection (even if the actual MCP server is not yet implemented).
 
@@ -121,5 +121,6 @@ docker push us-west1-docker.pkg.dev/project/repo/mcp-server
 Deploy image to Cloud Run, require no authentication, configure max possible timeout (3600 seconds).
 
 Add env vars:
-ACCESS_TOKEN_SECRET
-OAUTH_API_BASE_URL
+- ACCESS_TOKEN_SECRET
+- AUTHORIZATION_SERVER_BASE_URL
+- MCP_SERVER_BASE_URL

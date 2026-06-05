@@ -45,7 +45,7 @@
         "ProtocolType": "HTTP"
       }
     },
-    "OAuthFunctionIntegration": {
+    "AuthorizationServerFunctionIntegration": {
       "Type": "AWS::ApiGatewayV2::Integration",
       "Properties": {
         "ApiId": {
@@ -55,11 +55,11 @@
         "IntegrationType": "AWS_PROXY",
         "IntegrationUri": {
           "Fn::Sub": [
-            "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OAuthFunctionArn}/invocations",
+            "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthorizationServerFunctionArn}/invocations",
             {
-              "OAuthFunctionArn": {
+              "AuthorizationServerFunctionArn": {
                 "Fn::GetAtt": [
-                  "OAuthFunction",
+                  "AuthorizationServerFunction",
                   "Arn"
                 ]
               }
@@ -69,7 +69,7 @@
         "PayloadFormatVersion": "2.0"
       }
     },
-    "OAuthRoute": {
+    "AuthorizationServerFunctionRoute": {
       "Type": "AWS::ApiGatewayV2::Route",
       "Properties": {
         "ApiId": {
@@ -78,7 +78,7 @@
         "AuthorizationType": "NONE",
         "RouteKey": "$default",
         "Target": {
-          "Fn::Sub": "integrations/${OAuthFunctionIntegration}"
+          "Fn::Sub": "integrations/${AuthorizationServerFunctionIntegration}"
         }
       }
     },
@@ -138,7 +138,7 @@
         }
       }
     },
-    "OAuthFunctionRole": {
+    "AuthorizationServerFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -176,7 +176,7 @@
                       "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${FunctionName}:*",
                       {
                         "FunctionName": {
-                          "Fn::Sub": "${AWS::StackName}-oauth-function"
+                          "Fn::Sub": "${AWS::StackName}-authorization-server-function"
                         }
                       }
                     ]
@@ -218,11 +218,11 @@
           }
         ],
         "RoleName": {
-          "Fn::Sub": "${AWS::StackName}-oauth-function-role"
+          "Fn::Sub": "${AWS::StackName}-authorization-server-function-role"
         }
       }
     },
-    "OAuthFunction": {
+    "AuthorizationServerFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Architectures": [
@@ -257,24 +257,24 @@
           }
         },
         "FunctionName": {
-          "Fn::Sub": "${AWS::StackName}-oauth-function"
+          "Fn::Sub": "${AWS::StackName}-authorization-server-function"
         },
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "OAuthFunctionRole",
+            "AuthorizationServerFunctionRole",
             "Arn"
           ]
         },
         "Runtime": "nodejs24.x"
       }
     },
-    "OAuthFunctionPermission": {
+    "AuthorizationServerFunctionPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Ref": "OAuthFunction"
+          "Ref": "AuthorizationServerFunction"
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {

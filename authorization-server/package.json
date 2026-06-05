@@ -1,8 +1,8 @@
 {
-  "name": "@remote-mcp-auth/oauth-function",
+  "name": "@remote-mcp-auth/authorization-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Remote MCP Auth - OAuth Function",
+  "description": "Remote MCP Auth - Authorization Server",
   "homepage": "https://github.com/loginov-rocks/Remote-MCP-Auth",
   "bugs": {
     "url": "https://github.com/loginov-rocks/Remote-MCP-Auth/issues"
@@ -15,16 +15,16 @@
   "author": "Danila Loginov <danila@loginov.rocks> (https://loginov.rocks)",
   "scripts": {
     "generate-secret": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64'))\"",
-    "package": "rm -f oauth-function.zip && zip -j oauth-function.zip src/*",
+    "package": "rm -f authorization-server.zip && zip -j authorization-server.zip src/*",
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.1062.0",
-    "@aws-sdk/lib-dynamodb": "^3.1062.0"
+    "@aws-sdk/client-dynamodb": "^3.1063.0",
+    "@aws-sdk/lib-dynamodb": "^3.1063.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.161",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "typescript": "^6.0.3"
   }
 }
