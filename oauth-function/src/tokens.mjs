@@ -1,38 +1,23 @@
-import { createHmac } from 'crypto';
+import { createHmac } from 'node:crypto';
 
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TTL, AUTHORIZATION_SERVER_BASE_URL, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TTL } from './constants.mjs';
+import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TTL, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TTL } from './constants.mjs';
 
-const base64UrlEncode = (str) => Buffer.from(str)
-  .toString('base64')
-  .replace(/\+/g, '-')
-  .replace(/\//g, '_')
-  .replace(/=/g, '');
-
-const base64UrlDecode = (str) => {
-  str += '='.repeat((4 - str.length % 4) % 4);
-  str = str.replace(/-/g, '+').replace(/_/g, '/');
-
-  return Buffer.from(str, 'base64').toString();
+function computeSignature(secret, header, payload) {
+  return createHmac('sha256', secret)
+    .update(`${header}.${payload}`)
+    .digest('base64url');
 }
 
-// Custom implementation to avoid build dependencies.
-const generateSignature = (secret, header, payload) => createHmac('sha256', secret)
-  .update(`${header}.${payload}`)
-  .digest('base64')
-  .replace(/\+/g, '-')
-  .replace(/\//g, '_')
-  .replace(/=/g, '');
-
-const generateJwt = (secret, sub, expiresIn, clientId, resource, scope) => {
+function signToken({ clientId, issuer, resource, scope, secret, studentId, ttl }) {
   const header = {
     alg: 'HS256',
     typ: 'JWT',
   };
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    exp: now + expiresIn,
-    iss: AUTHORIZATION_SERVER_BASE_URL,
-    sub,
+    exp: now + ttl,
+    iss: issuer,
+    sub: studentId,
   };
 
   if (clientId) {
@@ -47,47 +32,49 @@ const generateJwt = (secret, sub, expiresIn, clientId, resource, scope) => {
     payload.scope = scope;
   }
 
-  const encodedHeader = base64UrlEncode(JSON.stringify(header));
-  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
-
-  const signature = generateSignature(secret, encodedHeader, encodedPayload);
+  const encodedHeader = Buffer.from(JSON.stringify(header), 'utf8').toString('base64url');
+  const encodedPayload = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
+  const signature = computeSignature(secret, encodedHeader, encodedPayload);
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
-};
+}
 
-const validateJwt = (secret, jwt) => {
-  const [encodedHeader, encodedPayload, signature] = jwt.split('.');
+function verifyToken(secret, token) {
+  const [encodedHeader, encodedPayload, signature] = token.split('.');
 
   if (!encodedHeader || !encodedPayload || !signature) {
     return null;
   }
 
-  if (generateSignature(secret, encodedHeader, encodedPayload) !== signature) {
+  if (computeSignature(secret, encodedHeader, encodedPayload) !== signature) {
     return null;
   }
 
-  const payload = JSON.parse(base64UrlDecode(encodedPayload));
+  const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8'));
   const now = Math.floor(Date.now() / 1000);
 
   if (!payload.sub || !payload.exp || now > payload.exp) {
     return null;
   }
 
-  return payload;
-};
+  return {
+    clientId: payload.client_id,
+    issuer: payload.iss,
+    resource: payload.aud,
+    scope: payload.scope,
+    studentId: payload.sub,
+  };
+}
 
-export const createAccessToken = (studentId, clientId, resource, scope) => {
+export function issueTokens({ clientId, issuer, resource, scope, studentId }) {
+  const claims = { clientId, issuer, resource, scope, studentId };
   const expiresIn = ACCESS_TOKEN_TTL;
-  const accessToken = generateJwt(ACCESS_TOKEN_SECRET, studentId, expiresIn, clientId, resource, scope);
+  const accessToken = signToken({ ...claims, secret: ACCESS_TOKEN_SECRET, ttl: expiresIn });
+  const refreshToken = signToken({ ...claims, secret: REFRESH_TOKEN_SECRET, ttl: REFRESH_TOKEN_TTL });
 
-  return { accessToken, expiresIn };
-};
+  return { accessToken, expiresIn, refreshToken };
+}
 
-export const createRefreshToken = (studentId, scope) => {
-  const expiresIn = REFRESH_TOKEN_TTL;
-  const refreshToken = generateJwt(REFRESH_TOKEN_SECRET, studentId, expiresIn, null, null, scope);
-
-  return { refreshToken, expiresIn };
-};
-
-export const validateRefreshToken = (token) => validateJwt(REFRESH_TOKEN_SECRET, token);
+export function verifyRefreshToken(token) {
+  return verifyToken(REFRESH_TOKEN_SECRET, token);
+}

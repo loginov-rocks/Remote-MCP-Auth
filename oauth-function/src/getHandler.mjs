@@ -4,4 +4,4 @@ export function getHandler() {
     headers: { 'Content-Type': 'text/plain' },
     body: 'OK',
   };
-};
+}

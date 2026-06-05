@@ -20,7 +20,7 @@ export async function createClient({ name, redirectUris, scope }) {
   await dynamoDbDocumentClient.send(putCommand);
 
   return item;
-};
+}
 
 export function deleteClient(id) {
   const deleteCommand = new DeleteCommand({
@@ -39,9 +39,9 @@ export async function findClient(id) {
 
   const getCommandOutput = await dynamoDbDocumentClient.send(getCommand);
 
-  if (!getCommandOutput || !getCommandOutput.Item) {
+  if (!getCommandOutput.Item) {
     return null;
   }
 
   return getCommandOutput.Item;
-};
+}

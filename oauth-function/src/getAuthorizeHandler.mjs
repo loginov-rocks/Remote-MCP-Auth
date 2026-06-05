@@ -7,7 +7,7 @@ function esc(str) {
     return '';
   }
 
-  return str.replace(/[&<>"']/g, c => ({
+  return str.replace(/[&<>"']/g, (c) => ({
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -20,13 +20,7 @@ export async function getAuthorizeHandler(event) {
   const params = event.queryStringParameters;
   console.log('getAuthorizeParams', JSON.stringify(params));
 
-  let client;
-  try {
-    client = await findClient(params.client_id);
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500 };
-  }
+  const client = await findClient(params.client_id);
 
   // Error example: the client_id matches no registered client, so per the specification the error is invalid_client.
   if (!client) {
@@ -76,4 +70,4 @@ export async function getAuthorizeHandler(event) {
 </html>
 `,
   };
-};
+}

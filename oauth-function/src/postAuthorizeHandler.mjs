@@ -4,15 +4,11 @@ import { findClient } from './clients.mjs';
 export async function postAuthorizeHandler(event) {
   const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('utf8') : event.body;
   const params = Object.fromEntries(new URLSearchParams(body));
+  // Strip the trailing slash Claude adds to the resource, keeping the minted and compared aud canonical.
+  params.resource &&= params.resource.replace(/\/$/, '');
   console.log('postAuthorizeParams', JSON.stringify(params));
 
-  let client;
-  try {
-    client = await findClient(params.client_id);
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500 };
-  }
+  const client = await findClient(params.client_id);
 
   // Error example: these values come from the submitted form and aren't verified yet, so there's no trusted callback
   // to redirect to - the error is returned directly per the specification.
@@ -51,20 +47,14 @@ export async function postAuthorizeHandler(event) {
     };
   }
 
-  let code;
-  try {
-    code = await createCode({
-      clientId: params.client_id,
-      codeChallenge: params.code_challenge,
-      redirectUri: params.redirect_uri,
-      resource: params.resource,
-      scope: params.scope,
-      studentId: params.student_id,
-    });
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500 };
-  }
+  const code = await createCode({
+    clientId: params.client_id,
+    codeChallenge: params.code_challenge,
+    redirectUri: params.redirect_uri,
+    resource: params.resource,
+    scope: params.scope,
+    studentId: params.student_id,
+  });
 
   redirectUrl.searchParams.set('code', code.code);
 
@@ -72,4 +62,4 @@ export async function postAuthorizeHandler(event) {
     statusCode: 302,
     headers: { Location: redirectUrl.toString() },
   };
-};
+}

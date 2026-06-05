@@ -4,17 +4,11 @@ export async function postRegisterHandler(event) {
   const params = JSON.parse(event.body);
   console.log('postRegisterParams', JSON.stringify(params));
 
-  let client;
-  try {
-    client = await createClient({
-      name: params.client_name,
-      redirectUris: params.redirect_uris,
-      scope: params.scope,
-    });
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500 };
-  }
+  const client = await createClient({
+    name: params.client_name,
+    redirectUris: params.redirect_uris,
+    scope: params.scope,
+  });
 
   return {
     statusCode: 201,
@@ -33,4 +27,4 @@ export async function postRegisterHandler(event) {
       scope: client.scope, // echo back the scopes registered for this client
     }),
   };
-};
+}

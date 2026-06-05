@@ -20,4 +20,4 @@ export function getAuthorizationServerMetadataHandler(event) {
       client_id_metadata_document_supported: true, // clients can use a URL as their client_id (points to their metadata doc) instead of pre-registering - the lightweight path for MCP
     }),
   };
-};
+}

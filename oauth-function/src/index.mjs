@@ -24,7 +24,7 @@ export const handler = async (event) => {
   ));
 
   if (!route) {
-    console.error('Route not found');
+    console.warn('Not Found');
     return { statusCode: 404 };
   }
 
@@ -35,7 +35,7 @@ export const handler = async (event) => {
 
     return response;
   } catch (error) {
-    console.error('An error was thrown when executing the handler:', error);
+    console.error('Internal Server Error', error);
     return { statusCode: 500 };
   }
 };
