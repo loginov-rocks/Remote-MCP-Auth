@@ -1,6 +1,12 @@
-import { createClient } from './clients.mjs';
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 
-export async function postRegisterHandler(event) {
+import { createClient } from './clients.ts';
+
+export async function postRegisterHandler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
+  if (!event.body) {
+    throw new Error('Missing request body');
+  }
+
   const params = JSON.parse(event.body);
   console.log('postRegisterParams', JSON.stringify(params));
 

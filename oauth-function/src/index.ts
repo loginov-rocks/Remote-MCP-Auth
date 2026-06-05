@@ -1,9 +1,11 @@
-import { getAuthorizationServerMetadataHandler } from './getAuthorizationServerMetadataHandler.mjs';
-import { getAuthorizeHandler } from './getAuthorizeHandler.mjs';
-import { getHandler } from './getHandler.mjs';
-import { postAuthorizeHandler } from './postAuthorizeHandler.mjs';
-import { postRegisterHandler } from './postRegisterHandler.mjs';
-import { postTokenHandler } from './postTokenHandler.mjs';
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
+
+import { getAuthorizationServerMetadataHandler } from './getAuthorizationServerMetadataHandler.ts';
+import { getAuthorizeHandler } from './getAuthorizeHandler.ts';
+import { getHandler } from './getHandler.ts';
+import { postAuthorizeHandler } from './postAuthorizeHandler.ts';
+import { postRegisterHandler } from './postRegisterHandler.ts';
+import { postTokenHandler } from './postTokenHandler.ts';
 
 const routes = [
   { method: 'get', path: '/', handler: getHandler },
@@ -14,7 +16,7 @@ const routes = [
   { method: 'post', path: '/oauth/token', handler: postTokenHandler },
 ];
 
-export const handler = async (event) => {
+export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
   console.log('event', JSON.stringify(event));
 
   const { requestContext: { http } } = event;

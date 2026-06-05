@@ -1,24 +1,41 @@
-import { findClient } from './clients.mjs';
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
+
+import { findClient } from './clients.ts';
 
 const POST_AUTHORIZE_ROUTE = '/oauth/authorize';
 
-function esc(str) {
+function esc(str: string | undefined): string {
   if (typeof str !== 'string') {
     return '';
   }
 
-  return str.replace(/[&<>"']/g, (c) => ({
+  const ESCAPE_MAP = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#39;',
-  }[c]));
+  };
+
+  return str.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c as keyof typeof ESCAPE_MAP]);
 }
 
-export async function getAuthorizeHandler(event) {
+export async function getAuthorizeHandler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
+  if (!event.queryStringParameters) {
+    throw new Error('Missing request query string parameters');
+  }
+
   const params = event.queryStringParameters;
   console.log('getAuthorizeParams', JSON.stringify(params));
+
+  // Error example: no client_id or redirect_uri was supplied, so per the specification the error is invalid_request.
+  if (!params.client_id || !params.redirect_uri) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'invalid_request' }),
+    };
+  }
 
   const client = await findClient(params.client_id);
 

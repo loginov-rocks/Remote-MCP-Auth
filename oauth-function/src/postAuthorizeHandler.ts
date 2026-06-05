@@ -1,7 +1,13 @@
-import { createCode } from './authCodes.mjs';
-import { findClient } from './clients.mjs';
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 
-export async function postAuthorizeHandler(event) {
+import { createAuthCode } from './authCodes.ts';
+import { findClient } from './clients.ts';
+
+export async function postAuthorizeHandler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
+  if (!event.body) {
+    throw new Error('Missing request body');
+  }
+
   const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('utf8') : event.body;
   const params = Object.fromEntries(new URLSearchParams(body));
   // Strip the trailing slash Claude adds to the resource, keeping the minted and compared aud canonical.
@@ -47,16 +53,16 @@ export async function postAuthorizeHandler(event) {
     };
   }
 
-  const code = await createCode({
+  const authCode = await createAuthCode({
     clientId: params.client_id,
     codeChallenge: params.code_challenge,
     redirectUri: params.redirect_uri,
-    resource: params.resource,
-    scope: params.scope,
+    resource: params.resource !== '' ? params.resource : undefined,
+    scope: params.scope !== '' ? params.scope : undefined,
     studentId: params.student_id,
   });
 
-  redirectUrl.searchParams.set('code', code.code);
+  redirectUrl.searchParams.set('code', authCode.code);
 
   return {
     statusCode: 302,
